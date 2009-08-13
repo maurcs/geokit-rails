@@ -463,6 +463,81 @@ class ActsAsMappableTest < ActiveSupport::TestCase #:nodoc: all
     locations = Location.count(:origin =>[@loc_a.lat,@loc_a.lng], :conditions => "distance < 3.97")
     assert_equal 5, locations
   end
+  
+  def test_find_north_of
+		#can pass lat & long
+    locations = Location.find(:all, :north_of =>[@loc_a.lat,@loc_a.lng])
+    assert locations.length > 0
+		locations.each do |loc|
+			assert_operator loc.lat, :>, @loc_a.lat
+		end
+		
+		# or can pass just lat
+    locations = Location.find(:all, :north_of =>@loc_a.lat)
+    assert locations.length > 0
+		locations.each do |loc|
+			assert_operator loc.lat, :>, @loc_a.lat
+		end
+  end
+  
+  def test_find_south_of
+  		#can pass lat & long
+    locations = Location.find(:all, :south_of =>[@loc_a.lat,@loc_a.lng])
+    assert locations.length > 0
+ 		locations.each do |loc|
+ 			assert_operator loc.lat, :<, @loc_a.lat
+ 		end
+  		
+  		# or can pass just lat
+    locations = Location.find(:all, :south_of =>@loc_a.lat)
+    assert locations.length > 0
+ 		locations.each do |loc|
+ 			assert_operator loc.lat, :<, @loc_a.lat
+ 		end
+  end
+  
+  def test_find_west_of
+  		#can pass lat & long
+    locations = Location.find(:all, :west_of =>[@loc_a.lat,@loc_a.lng])
+    assert locations.length > 0
+ 		locations.each do |loc|
+ 			assert_operator loc.lng, :<, @loc_a.lng
+ 		end
+  		
+  		# or can pass just lng
+    locations = Location.find(:all, :west_of =>@loc_a.lng)
+    assert locations.length > 0
+ 		locations.each do |loc|
+ 			assert_operator loc.lng, :<, @loc_a.lng
+ 		end
+  end
+  
+  def test_find_east_of
+		# add an eastern point
+		Location.create({
+			:id => 7,
+			:company_id => 2,
+			:street => "2401 E Airport Fwy",
+			:city => "Irving",
+			:state => "TX",
+			:postal_code => "75062",
+			:lat => "32.862502",
+			:lng => "-96.908426"
+		})
+  		#can pass lat & long
+    locations = Location.find(:all, :east_of =>[@loc_a.lat,@loc_a.lng])
+    assert locations.length > 0
+ 		locations.each do |loc|
+ 			assert_operator loc.lng, :>, @loc_a.lng
+ 		end
+  		
+  		# or can pass just lng
+    locations = Location.find(:all, :east_of =>@loc_a.lng)
+    assert locations.length > 0
+ 		locations.each do |loc|
+ 			assert_operator loc.lng, :>, @loc_a.lng
+ 		end
+  end
 
 
   # Bounding box tests

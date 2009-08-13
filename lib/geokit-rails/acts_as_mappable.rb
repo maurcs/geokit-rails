@@ -223,7 +223,9 @@ module Geokit
       end
 
       private
-
+				
+				CARDINAL_SCOPES = [:north_of,:south_of,:west_of,:east_of]
+				
         # Prepares either a find or a count action by parsing through the options and
         # conditionally adding to the select clause for finders.
         def prepare_for_find_or_count(action, args)
@@ -234,15 +236,18 @@ module Geokit
           units = extract_units_from_options(options)
           formula = extract_formula_from_options(options)
           bounds = extract_bounds_from_options(options)
+          cardinals = extract_cardinals_from_options(options)
 
           # Only proceed if this is a geokit-related query
-          if origin || bounds
+          if origin || bounds || !cardinals.empty?
             # if no explicit bounds were given, try formulating them from the point and distance given
             bounds = formulate_bounds_from_distance(options, origin, units) unless bounds
             # Apply select adjustments based upon action.
             add_distance_to_select(options, origin, units, formula) if origin && action == :find
             # Apply the conditions for a bounding rectangle if applicable
             apply_bounds_conditions(options,bounds) if bounds
+						# Apply the conditions for a north of search
+						apply_cardinal_conditions(options,cardinals) unless cardinals.empty?
             # Apply distance scoping and perform substitutions.
             apply_distance_scope(options)
             substitute_distance_in_conditions(options, origin, units, formula) if origin && options.has_key?(:conditions)
@@ -333,6 +338,16 @@ module Geokit
           bounds_sql = "#{qualified_lat_column_name}>#{sw.lat} AND #{qualified_lat_column_name}<#{ne.lat} AND #{lng_sql}"
           options[:conditions] = merge_conditions(options[:conditions], bounds_sql)
         end
+				
+				# Alters the conditions to include a latitude comparison row.lat > incoming.lat
+				def apply_cardinal_conditions(options,cardinals)
+					cardinals.each do |dir,coord|
+						axis = dir.to_s =~ /(?:nor|sou)th_of/ ? "lat": "lng"
+						operator = dir.to_s =~ /(?:north|east)_of/ ? ">": "<"
+						coordinates_sql = "(#{send("qualified_#{axis}_column_name")}#{operator}#{coord})"
+						options[:conditions] = merge_conditions(options[:conditions],coordinates_sql)
+					end
+				end
 
         # Extracts the origin instance out of the options if it exists and returns
         # it.  If there is no origin, looks for latitude and longitude values to 
@@ -365,6 +380,18 @@ module Geokit
         def extract_bounds_from_options(options)
           bounds = options.delete(:bounds)
           bounds = Geokit::Bounds.normalize(bounds) if bounds
+        end
+				
+				# Extract cardinal params
+        def extract_cardinals_from_options(options)
+					CARDINAL_SCOPES.inject({}) do |h,dir|
+						if options[dir]
+	 	        	coords = options.delete(dir)
+							lat_or_lng = dir.to_s =~ /(?:nor|sou)th_of/ ? :first : :last
+							h[dir] = [coords].flatten.send(lat_or_lng)
+						end
+						h
+					end
         end
 
         # Geocode IP address.
