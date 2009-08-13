@@ -146,7 +146,7 @@ the finders.  So for instance:
 ## CARDINALITY QUERIES
 
 If you want to only find locations that are a cardinal direction from a given set of coordinates, 
-you should use cardinal scopes (:north_of, :east_of, :south_of, :west_of). Like so:
+you should use cardinal scopes (`:north_of`, `:east_of`, `:south_of`, `:west_of`). Like so:
 		
     find(:all, :north_of=>[@lat,@lng] ) # You can pass the lat and long
     find(:all, :north_of=>@lat ) # or pass just lat or long
@@ -156,6 +156,22 @@ you should use cardinal scopes (:north_of, :east_of, :south_of, :west_of). Like 
 		
 		# You can pass in multiple directions
     find(:all, :south_of=>@lat, :west_of=>@lng )
+
+## DIRECTIONAL QUERIES
+
+If you have a course (the direction you are facing, a degree between 0..360), and an origin, 
+then you can get results for the direction you are facing using `:within_course`:
+	
+		# would return results for everything North of origin
+		find(:all, :withing_course=>15.0, :origin=>[@lat,@lng] ) 
+	
+		# would return results for everything Northwest of origin
+		find(:all, :withing_course=>315.0, :origin=>[@lat,@lng] ) 
+	
+		# would return results for everything South of origin
+		find(:all, :withing_course=>240.0, :origin=>[@lat,@lng] ) 
+	
+Note: `:origin` is required for this to work
 
 ## FINDING WITHIN A BOUNDING BOX
  
