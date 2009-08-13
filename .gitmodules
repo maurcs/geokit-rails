@@ -1,0 +1,6 @@
+[submodule "cardinalize"]
+	path = cardinalize
+	url = git@github.com:meanmarcus/cardinalize.git
+[submodule "lib/cardinalize"]
+	path = lib/cardinalize
+	url = git@github.com:meanmarcus/cardinalize.git

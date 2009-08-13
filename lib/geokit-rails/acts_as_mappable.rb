@@ -224,7 +224,7 @@ module Geokit
 
       private
 				
-				CARDINAL_SCOPES = [:north_of,:south_of,:west_of,:east_of]
+				CARDINAL_SCOPES = [:north_of,:south_of,:west_of,:east_of] # scope :within_course will override these values
 				
         # Prepares either a find or a count action by parsing through the options and
         # conditionally adding to the select clause for finders.
@@ -232,11 +232,11 @@ module Geokit
           options = args.extract_options!
           #options = defined?(args.extract_options!) ? args.extract_options! : extract_options_from_args!(args)
           # Obtain items affecting distance condition.
+          cardinals = extract_cardinals_or_within_course_from_options(options) #needs to come before origin since origin is a dependency
           origin = extract_origin_from_options(options)
           units = extract_units_from_options(options)
           formula = extract_formula_from_options(options)
           bounds = extract_bounds_from_options(options)
-          cardinals = extract_cardinals_from_options(options)
 
           # Only proceed if this is a geokit-related query
           if origin || bounds || !cardinals.empty?
@@ -383,7 +383,13 @@ module Geokit
         end
 				
 				# Extract cardinal params
-        def extract_cardinals_from_options(options)
+        def extract_cardinals_or_within_course_from_options(options)
+					if options[:origin] && options[:within_course]
+						origin = normalize_point_to_lat_lng(options[:origin])
+						course = options.delete(:within_course)
+						return build_cardinal_scopes_from_origin_and_course(origin, course)
+					end
+					
 					CARDINAL_SCOPES.inject({}) do |h,dir|
 						if options[dir]
 	 	        	coords = options.delete(dir)
@@ -393,6 +399,27 @@ module Geokit
 						h
 					end
         end
+				
+				def build_cardinal_scopes_from_origin_and_course(origin,course)
+					case course.cardinalize
+					when "Northeast"
+						{:north_of => origin.lat, :east_of => origin.lng}
+					when "East"
+						{:east_of => origin.lng}
+					when "Southeast"
+						{:south_of => origin.lat, :east_of => origin.lng}
+					when "South"
+						{:south_of => origin.lat}
+					when "Southwest"
+						{:south_of => origin.lat, :west_of => origin.lng}
+					when "West"
+						{:west_of => origin.lng}
+					when "Northwest"
+						{:north_of => origin.lat, :west_of => origin.lng}
+					else
+						{:north_of => origin.lat}
+					end
+				end
 
         # Geocode IP address.
         def geocode_ip_address(origin)
