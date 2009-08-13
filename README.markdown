@@ -147,13 +147,14 @@ the finders.  So for instance:
 
 If you want to only find locations that are a cardinal direction from a given set of coordinates, 
 you should use cardinal scopes (:north_of, :east_of, :south_of, :west_of). Like so:
-
-    find(:all, :north_of=>[@lat,@lng] )
-    find(:all, :north_of=>@lat )
+		
+    find(:all, :north_of=>[@lat,@lng] ) # You can pass the lat and long
+    find(:all, :north_of=>@lat ) # or pass just lat or long
 		
     find(:all, :east_of=>[@lat,@lng] )
     find(:all, :east_of=>@lng )
 		
+		# You can pass in multiple directions
     find(:all, :south_of=>@lat, :west_of=>@lng )
 
 ## FINDING WITHIN A BOUNDING BOX
