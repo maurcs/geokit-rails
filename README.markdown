@@ -109,17 +109,6 @@ Note however that the third form should be avoided. With either of the first two
 Geokit automatically adds a bounding box to speed up the radial query in the database.
 With the third form, it does not.
 
-If you want to only find locations that are a cardinal direction from a given set of coordinates, 
-you should use cardinal scopes (:north_of, :east_of, :south_of, :west_of). Like so:
-
-    find(:all, :north_of=>[@lat,@lng] )
-    find(:all, :north_of=>@lat )
-		
-    find(:all, :east_of=>[@lat,@lng] )
-    find(:all, :east_of=>@lng )
-		
-    find(:all, :south_of=>@lat, :west_of=>@lng )
-
 If you need to combine distance conditions with other conditions, you should do
 so like this:
 
@@ -153,6 +142,19 @@ the finders.  So for instance:
     count(:origin, :conditions => "distance < 5")
     count_within(distance, :origin => @somewhere)
     count_beyond(distance, :origin => @somewhere)
+
+## CARDINALITY QUERIES
+
+If you want to only find locations that are a cardinal direction from a given set of coordinates, 
+you should use cardinal scopes (:north_of, :east_of, :south_of, :west_of). Like so:
+
+    find(:all, :north_of=>[@lat,@lng] )
+    find(:all, :north_of=>@lat )
+		
+    find(:all, :east_of=>[@lat,@lng] )
+    find(:all, :east_of=>@lng )
+		
+    find(:all, :south_of=>@lat, :west_of=>@lng )
 
 ## FINDING WITHIN A BOUNDING BOX
  
