@@ -117,6 +117,8 @@ you should use cardinal scopes (:north_of, :east_of, :south_of, :west_of). Like 
 		
     find(:all, :east_of=>[@lat,@lng] )
     find(:all, :east_of=>@lng )
+		
+    find(:all, :south_of=>@lat, :west_of=>@lng )
 
 If you need to combine distance conditions with other conditions, you should do
 so like this:
