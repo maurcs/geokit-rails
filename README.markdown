@@ -159,19 +159,22 @@ you should use cardinal scopes (`:north_of`, `:east_of`, `:south_of`, `:west_of`
 
 ## DIRECTIONAL QUERIES
 
-If you have a course (the direction you are facing, a degree between 0..360), and an origin, 
-then you can get results for the direction you are facing using `:within_course`:
+If you have a course (the direction you are facing, a float between 0..360), and an `:origin`, 
+then you can get results for everything `:in_front_of` `:origin` or `:behind` `:origin`:
 	
 		# would return results for everything North of origin
-		find(:all, :within_course=>15.0, :origin=>[@lat,@lng] ) 
-	
-		# would return results for everything Northwest of origin
-		find(:all, :within_course=>315.0, :origin=>[@lat,@lng] ) 
+		find(:all, :in_front_of=>15.0, :origin=>[@lat,@lng] ) 
 	
 		# would return results for everything South of origin
-		find(:all, :within_course=>240.0, :origin=>[@lat,@lng] ) 
+		find(:all, :behind=>15.0, :origin=>[@lat,@lng] ) 
 	
-Note: `:origin` is required for this to work
+		# would return results for everything Northwest of origin
+		find(:all, :in_front_of=>315.0, :origin=>[@lat,@lng] ) 
+	
+		# would return results for everything Southeast of origin
+		find(:all, :behind=>315.0, :origin=>[@lat,@lng] ) 
+	
+Note: `:origin` is required for this to work. If both `:in_front_of` and `:behind` are sent, only `:in_front_of` will be used.
 
 ## FINDING WITHIN A BOUNDING BOX
  

@@ -232,7 +232,7 @@ module Geokit
           options = args.extract_options!
           #options = defined?(args.extract_options!) ? args.extract_options! : extract_options_from_args!(args)
           # Obtain items affecting distance condition.
-          cardinals = extract_cardinals_or_within_course_from_options(options) #needs to come before origin since origin is a dependency
+          cardinals = extract_cardinals_from_options(options) #needs to come before origin since origin is a dependency
           origin = extract_origin_from_options(options)
           units = extract_units_from_options(options)
           formula = extract_formula_from_options(options)
@@ -383,8 +383,8 @@ module Geokit
         end
 				
 				# Extract cardinal params
-        def extract_cardinals_or_within_course_from_options(options)
-					course = options.delete(:within_course)
+        def extract_cardinals_from_options(options)
+					course = get_course_from_in_front_of_or_behind(options)
 					if options[:origin] && course
 						origin = normalize_point_to_lat_lng(options[:origin])
 						return build_cardinal_scopes_from_origin_and_course(origin, course)
@@ -399,6 +399,16 @@ module Geokit
 						h
 					end
         end
+
+				def get_course_from_in_front_of_or_behind(options)
+					in_front = options.delete(:in_front_of)
+					behind = options.delete(:behind)
+					if in_front
+						in_front.to_f
+					elsif behind
+						behind.to_f>180.0 ? (behind.to_f - 180.0) : (behind.to_f + 180.0)
+					end
+				end
 				
 				def build_cardinal_scopes_from_origin_and_course(origin,course)
 					case course.cardinalize

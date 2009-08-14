@@ -543,50 +543,21 @@ class ActsAsMappableTest < ActiveSupport::TestCase #:nodoc: all
 		assert_equal 180.cardinalize, "South"
 	end
   
-  def test_find_within_course_north
-  	course = 0.0 # nort
-    locations = Location.find(:all, :within_course =>course, :origin=>[@loc_a.lat,@loc_a.lng])
+  def test_find_in_front_of
+  	course = 0 # north
+    locations = Location.find(:all, :in_front_of=>course, :origin=>[@loc_a.lat,@loc_a.lng])
     assert locations.length > 0
  		locations.each do |loc|
  			assert_operator loc.lat, :>, @loc_a.lat
  		end
   end
   
-  def test_find_within_course_south
-  	course = 180.0 # south
-    locations = Location.find(:all, :within_course =>course, :origin=>[@loc_a.lat,@loc_a.lng])
+  def test_find_behind
+  	course = 0 # north
+    locations = Location.find(:all, :behind=>course, :origin=>[@loc_a.lat,@loc_a.lng])
     assert locations.length > 0
  		locations.each do |loc|
  			assert_operator loc.lat, :<, @loc_a.lat
- 		end
-  end
-  
-  def test_find_within_course_east
-		# add an eastern point
-		Location.create({
-			:id => 7,
-			:company_id => 2,
-			:street => "2401 E Airport Fwy",
-			:city => "Irving",
-			:state => "TX",
-			:postal_code => "75062",
-			:lat => "32.862502",
-			:lng => "-96.908426"
-		})
-  	course = 90.0 # east
-    locations = Location.find(:all, :within_course =>course, :origin=>[@loc_a.lat,@loc_a.lng])
-    assert locations.length > 0
- 		locations.each do |loc|
- 			assert_operator loc.lng, :>, @loc_a.lng
- 		end
-  end
-  
-  def test_find_within_course_west
-  	course = 270.0 # west
-    locations = Location.find(:all, :within_course =>course, :origin=>[@loc_a.lat,@loc_a.lng])
-    assert locations.length > 0
- 		locations.each do |loc|
- 			assert_operator loc.lng, :<, @loc_a.lng
  		end
   end
 
