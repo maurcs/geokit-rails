@@ -384,9 +384,9 @@ module Geokit
 				
 				# Extract cardinal params
         def extract_cardinals_or_within_course_from_options(options)
-					if options[:origin] && options[:within_course]
+					course = options.delete(:within_course)
+					if options[:origin] && course
 						origin = normalize_point_to_lat_lng(options[:origin])
-						course = options.delete(:within_course)
 						return build_cardinal_scopes_from_origin_and_course(origin, course)
 					end
 					
