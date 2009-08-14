@@ -163,13 +163,13 @@ If you have a course (the direction you are facing, a degree between 0..360), an
 then you can get results for the direction you are facing using `:within_course`:
 	
 		# would return results for everything North of origin
-		find(:all, :withing_course=>15.0, :origin=>[@lat,@lng] ) 
+		find(:all, :within_course=>15.0, :origin=>[@lat,@lng] ) 
 	
 		# would return results for everything Northwest of origin
-		find(:all, :withing_course=>315.0, :origin=>[@lat,@lng] ) 
+		find(:all, :within_course=>315.0, :origin=>[@lat,@lng] ) 
 	
 		# would return results for everything South of origin
-		find(:all, :withing_course=>240.0, :origin=>[@lat,@lng] ) 
+		find(:all, :within_course=>240.0, :origin=>[@lat,@lng] ) 
 	
 Note: `:origin` is required for this to work
 
